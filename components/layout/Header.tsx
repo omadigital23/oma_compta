@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Bell, Search, Globe, ChevronDown, LogOut, User, Settings } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -8,6 +9,14 @@ import {
 import { MOCK_ENTREPRISE } from '@/lib/mock-data';
 
 export default function Header() {
+  const router = useRouter();
+
+  function handleLogout() {
+    window.localStorage.clear();
+    window.sessionStorage.clear();
+    router.replace('/login');
+  }
+
   return (
     <header className="h-16 border-b border-border bg-white/80 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-30">
       {/* Search */}
@@ -60,14 +69,14 @@ export default function Header() {
               <p className="text-xs text-muted-foreground">ousmane@omadigital.sn</p>
               <p className="text-xs text-muted-foreground mt-0.5">Rôle : Administrateur</p>
             </div>
-            <DropdownMenuItem className="gap-2 cursor-pointer">
+            <DropdownMenuItem className="gap-2 cursor-pointer" onClick={() => router.push('/parametres/profil')}>
               <User className="w-4 h-4" /> Mon profil
             </DropdownMenuItem>
-            <DropdownMenuItem className="gap-2 cursor-pointer">
+            <DropdownMenuItem className="gap-2 cursor-pointer" onClick={() => router.push('/parametres/entreprise')}>
               <Settings className="w-4 h-4" /> Paramètres
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 text-red-600 cursor-pointer">
+            <DropdownMenuItem className="gap-2 text-red-600 cursor-pointer" onClick={handleLogout}>
               <LogOut className="w-4 h-4" /> Déconnexion
             </DropdownMenuItem>
           </DropdownMenuContent>

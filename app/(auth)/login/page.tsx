@@ -83,7 +83,7 @@ export default function LoginPage() {
           <h2 className="text-2xl font-bold text-foreground mb-1" style={{ fontFamily: 'Plus Jakarta Sans' }}>Bienvenue</h2>
           <p className="text-sm text-muted-foreground mb-8">Connectez-vous à votre espace comptable</p>
 
-          <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); window.location.href = '/'; }}>
+          <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); window.location.href = '/facturation/factures'; }}>
             <div className="space-y-1.5">
               <Label className="text-sm">Adresse email</Label>
               <Input
