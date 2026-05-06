@@ -38,13 +38,13 @@ export default function FacturesPage() {
   return (
     <div className="space-y-6 animate-fade-in-up">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground font-[family-name:var(--font-heading)]">Factures</h1>
           <p className="text-sm text-muted-foreground mt-1">Gestion de la facturation — SYSCOHADA</p>
         </div>
-        <Link href="/facturation/factures/nouvelle">
-          <Button className="bg-[#1B4332] hover:bg-[#2D6A4F] text-white gap-2 rounded-xl shadow-lg shadow-[#1B4332]/20">
+        <Link href="/facturation/factures/nouvelle" className="w-full sm:w-auto">
+          <Button className="w-full bg-[#1B4332] hover:bg-[#2D6A4F] text-white gap-2 rounded-xl shadow-lg shadow-[#1B4332]/20 sm:w-auto">
             <Plus className="w-4 h-4" />
             Nouvelle facture
           </Button>
@@ -52,7 +52,7 @@ export default function FacturesPage() {
       </div>
 
       {/* KPI mini cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 stagger-children">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 stagger-children">
         <div className="bg-white rounded-xl border border-border p-4">
           <div className="flex items-center gap-2 mb-2">
             <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center"><Receipt className="w-3.5 h-3.5 text-blue-600" /></div>
@@ -84,14 +84,14 @@ export default function FacturesPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="flex items-center bg-white border border-border rounded-xl p-1 gap-0.5">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center">
+        <div className="flex w-full items-center gap-0.5 overflow-x-auto rounded-xl border border-border bg-white p-1 md:w-auto">
           {filtres.map(f => (
             <button
               key={f.value}
               onClick={() => setFiltreActif(f.value)}
               className={cn(
-                'px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200',
+                'shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200',
                 filtreActif === f.value
                   ? 'bg-[#1B4332] text-white shadow-sm'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
@@ -101,7 +101,7 @@ export default function FacturesPage() {
             </button>
           ))}
         </div>
-        <div className="relative flex-1 max-w-sm">
+        <div className="relative w-full md:max-w-sm md:flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
@@ -113,8 +113,57 @@ export default function FacturesPage() {
         </div>
       </div>
 
+      {/* Mobile invoice cards */}
+      <div className="space-y-3 md:hidden">
+        {factures.map((facture) => (
+          <article key={facture.id} className="rounded-2xl border border-border bg-white p-4 shadow-sm">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-money text-sm font-bold text-[#1B4332]">{facture.numero}</p>
+                <p className="mt-1 truncate text-sm font-semibold text-foreground">{facture.client?.nom}</p>
+                <p className="text-xs text-muted-foreground">{facture.client?.ville || 'Dakar'} - {formatDate(facture.date_facture)}</p>
+              </div>
+              <StatutBadgeFacture statut={facture.statut} />
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-3 rounded-xl bg-muted/35 p-3">
+              <div>
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Montant TTC</p>
+                <p className="mt-1 font-money text-sm font-bold text-foreground">{formatFCFA(facture.montant_ttc)}</p>
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Reste dû</p>
+                <p className={cn(
+                  'mt-1 font-money text-sm font-bold',
+                  facture.montant_restant > 0 ? 'text-amber-600' : 'text-emerald-600'
+                )}>
+                  {formatFCFA(facture.montant_restant)}
+                </p>
+              </div>
+              <div>
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Échéance</p>
+                <p className="mt-1 text-sm font-medium text-foreground">
+                  {facture.date_echeance ? formatDate(facture.date_echeance) : '-'}
+                </p>
+              </div>
+              <div className="flex items-end justify-end gap-1">
+                <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-white" aria-label="Voir la facture">
+                  <Eye className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+                <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-white" aria-label="Exporter la facture en PDF">
+                  <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+                <button className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-white" aria-label="Envoyer la facture">
+                  <Send className="h-3.5 w-3.5 text-muted-foreground" />
+                </button>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+
       {/* Invoices table */}
-      <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      <div className="hidden bg-white rounded-2xl border border-border overflow-hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>

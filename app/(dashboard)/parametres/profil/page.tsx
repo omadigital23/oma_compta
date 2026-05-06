@@ -62,7 +62,7 @@ export default function ProfilPage() {
             </div>
           </div>
           <div>
-            <Label className="mb-1.5 text-xs">Role</Label>
+            <Label className="mb-1.5 text-xs">Rôle</Label>
             <div className="flex h-10 items-center gap-2 rounded-xl border border-border bg-muted/30 px-3 text-sm text-muted-foreground">
               <User className="h-4 w-4" />
               Administrateur comptable

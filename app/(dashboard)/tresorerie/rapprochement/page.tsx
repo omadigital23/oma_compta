@@ -32,18 +32,18 @@ export default function RapprochementPage() {
 
   return (
     <div className="space-y-6 animate-fade-in-up">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground font-[family-name:var(--font-heading)]">Rapprochement bancaire</h1>
           <p className="text-sm text-muted-foreground mt-1">Matching automatique par date, montant et reference contre les ecritures comptables.</p>
         </div>
-        <Button className="bg-[#1B4332] hover:bg-[#2D6A4F] text-white gap-2 rounded-xl shadow-lg shadow-[#1B4332]/20">
+        <Button className="w-full bg-[#1B4332] hover:bg-[#2D6A4F] text-white gap-2 rounded-xl shadow-lg shadow-[#1B4332]/20 sm:w-auto">
           <FileUp className="w-4 h-4" />
           Importer releve
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
         {[
           { label: 'Transactions', value: String(MOCK_RAPPROCHEMENTS.length), icon: Link2, color: 'text-blue-700', bg: 'bg-blue-50' },
           { label: 'Montant analyse', value: formatFCFA(total), icon: Search, color: 'text-foreground', bg: 'bg-gray-100' },
@@ -62,8 +62,8 @@ export default function RapprochementPage() {
         ))}
       </div>
 
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="flex items-center bg-white border border-border rounded-xl p-1 gap-0.5">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center">
+        <div className="flex w-full items-center gap-0.5 overflow-x-auto rounded-xl border border-border bg-white p-1 md:w-auto">
           {[
             ['tous', 'Tous'],
             ['rapproche', 'Rapproches'],
@@ -74,7 +74,7 @@ export default function RapprochementPage() {
               key={value}
               onClick={() => setFiltre(value as typeof filtre)}
               className={cn(
-                'px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
+                'shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
                 filtre === value ? 'bg-[#1B4332] text-white shadow-sm' : 'text-muted-foreground hover:bg-muted/50'
               )}
             >
@@ -82,7 +82,7 @@ export default function RapprochementPage() {
             </button>
           ))}
         </div>
-        <div className="relative flex-1 max-w-sm">
+        <div className="relative w-full md:max-w-sm md:flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
@@ -94,7 +94,50 @@ export default function RapprochementPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-border overflow-hidden">
+      <div className="space-y-3 md:hidden">
+        {lignes.map((ligne) => {
+          const config = statutConfig[ligne.statut as keyof typeof statutConfig];
+          const Icon = config.icon;
+          return (
+            <article key={ligne.id} className="rounded-2xl border border-border bg-white p-4 shadow-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-foreground">{ligne.libelle}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{formatDate(ligne.date)} - {ligne.ecriture}</p>
+                </div>
+                <span className={cn('shrink-0 rounded-full px-2 py-1 text-[11px] font-bold', ligne.type === 'credit' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700')}>
+                  {ligne.type === 'credit' ? 'Credit' : 'Debit'}
+                </span>
+              </div>
+              <div className="mt-4 flex items-center justify-between gap-3 rounded-xl bg-muted/35 p-3">
+                <div>
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Montant</p>
+                  <p className={cn('mt-1 font-money text-sm font-bold', ligne.type === 'credit' ? 'text-emerald-700' : 'text-red-700')}>
+                    {ligne.type === 'credit' ? '+' : '-'}{formatFCFA(ligne.montant)}
+                  </p>
+                </div>
+                <Badge variant="outline" className={cn('shrink-0 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold', config.className)}>
+                  <Icon className="h-2.5 w-2.5" />
+                  {config.label}
+                </Badge>
+              </div>
+              {ligne.score > 0 && (
+                <div className="mt-3">
+                  <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Score de matching</span>
+                    <span className="font-money">{ligne.score}%</span>
+                  </div>
+                  <div className="h-2 overflow-hidden rounded-full bg-muted">
+                    <div className="h-full rounded-full bg-[#1B4332]" style={{ width: `${ligne.score}%` }} />
+                  </div>
+                </div>
+              )}
+            </article>
+          );
+        })}
+      </div>
+
+      <div className="hidden bg-white rounded-2xl border border-border overflow-hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>

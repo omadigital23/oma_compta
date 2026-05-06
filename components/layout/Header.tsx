@@ -1,14 +1,19 @@
 'use client';
 
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Bell, Search, Globe, ChevronDown, LogOut, User, Settings } from 'lucide-react';
+import { Bell, Search, Globe, ChevronDown, LogOut, User, Settings, Menu } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MOCK_ENTREPRISE } from '@/lib/mock-data';
 
-export default function Header() {
+type HeaderProps = {
+  onMenuClick?: () => void;
+};
+
+export default function Header({ onMenuClick }: HeaderProps) {
   const router = useRouter();
 
   function handleLogout() {
@@ -18,9 +23,31 @@ export default function Header() {
   }
 
   return (
-    <header className="h-16 border-b border-border bg-white/80 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-30">
+    <header className="h-16 border-b border-border bg-white/85 backdrop-blur-md flex items-center justify-between gap-2 px-3 sm:px-4 lg:px-6 sticky top-0 z-30">
+      <div className="flex items-center gap-2 lg:hidden">
+        <button
+          type="button"
+          onClick={onMenuClick}
+          className="h-10 w-10 rounded-xl border border-border bg-white text-foreground shadow-sm flex items-center justify-center"
+          aria-label="Ouvrir le menu"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <div className="flex items-center gap-2">
+          <Image
+            src="/oma-compta-mark.svg"
+            alt="OMA Compta"
+            width={32}
+            height={32}
+            priority
+            className="h-8 w-8 rounded-lg"
+          />
+          <span className="hidden min-[420px]:inline text-sm font-bold text-[#1B4332]">OMA Compta</span>
+        </div>
+      </div>
+
       {/* Search */}
-      <div className="flex items-center gap-3 flex-1 max-w-md">
+      <div className="hidden md:flex items-center gap-3 flex-1 max-w-md">
         <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
@@ -33,9 +60,9 @@ export default function Header() {
       </div>
 
       {/* Right side */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5 sm:gap-2 ml-auto">
         {/* Language toggle */}
-        <button className="flex items-center gap-1.5 h-9 px-3 rounded-lg hover:bg-muted transition-colors text-sm text-muted-foreground">
+        <button className="hidden sm:flex items-center gap-1.5 h-9 px-3 rounded-lg hover:bg-muted transition-colors text-sm text-muted-foreground">
           <Globe className="w-4 h-4" />
           <span className="font-medium">FR</span>
         </button>

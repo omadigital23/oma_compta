@@ -55,11 +55,22 @@ const navigation = [
   { name: 'Clients', href: '/clients', icon: Users2 },
   { name: 'Paramètres', href: '/parametres/entreprise', icon: Settings },
 ];
+const defaultMobileMenus = navigation
+  .map((item) => ('children' in item ? item.name : null))
+  .filter((name): name is string => Boolean(name));
 
-export default function Sidebar() {
+type SidebarProps = {
+  variant?: 'desktop' | 'mobile';
+  className?: string;
+  onNavigate?: () => void;
+};
+
+export default function Sidebar({ variant = 'desktop', className, onNavigate }: SidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-  const [openMenus, setOpenMenus] = useState<string[]>(['Facturation']);
+  const isMobile = variant === 'mobile';
+  const [openMenus, setOpenMenus] = useState<string[]>(() => (isMobile ? defaultMobileMenus : ['Facturation']));
+  const isCollapsed = !isMobile && collapsed;
 
   const toggleMenu = (name: string) => {
     setOpenMenus(prev =>
@@ -75,9 +86,11 @@ export default function Sidebar() {
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 z-40 h-screen flex flex-col transition-all duration-300 ease-in-out sidebar-glow',
+        'z-40 flex flex-col transition-all duration-300 ease-in-out sidebar-glow',
         'bg-[#1B4332] text-white/80',
-        collapsed ? 'w-[68px]' : 'w-[260px]'
+        isMobile ? 'relative h-full w-full shadow-none' : 'fixed left-0 top-0 h-screen',
+        !isMobile && (isCollapsed ? 'w-[68px]' : 'w-[260px]'),
+        className
       )}
     >
       {/* Logo */}
@@ -88,9 +101,10 @@ export default function Sidebar() {
             alt="OMA Compta"
             width={36}
             height={36}
+            priority
             className="w-9 h-9 rounded-lg shrink-0 shadow-lg"
           />
-          {!collapsed && (
+          {!isCollapsed && (
             <div className="animate-fade-in-up">
               <h1 className="text-base font-bold text-white font-[family-name:var(--font-heading)] tracking-tight">OMA Compta</h1>
               <p className="text-[10px] text-white/50 tracking-wider uppercase">SYSCOHADA Révisé</p>
@@ -107,7 +121,7 @@ export default function Sidebar() {
               const isOpen = openMenus.includes(item.name);
               const hasActiveChild = item.children.some(c => isActive(c.href));
 
-              if (collapsed) {
+              if (isCollapsed) {
                 return (
                   <Tooltip key={item.name}>
                     <TooltipTrigger className={cn(
@@ -120,7 +134,7 @@ export default function Sidebar() {
                       <div className="space-y-1">
                         <p className="font-semibold text-xs">{item.name}</p>
                         {item.children.map(child => (
-                          <Link key={child.href} href={child.href}
+                          <Link key={child.href} href={child.href} onClick={onNavigate}
                             className={cn('block text-xs py-0.5', isActive(child.href) ? 'text-[#C9A84C]' : 'text-white/70 hover:text-white')}>
                             {child.name}
                           </Link>
@@ -149,7 +163,7 @@ export default function Sidebar() {
                     isOpen ? 'max-h-40 opacity-100 mt-0.5' : 'max-h-0 opacity-0'
                   )}>
                     {item.children.map(child => (
-                      <Link key={child.href} href={child.href}
+                      <Link key={child.href} href={child.href} onClick={onNavigate}
                         className={cn(
                           'flex items-center gap-3 pl-10 pr-3 h-9 rounded-lg text-[13px] transition-all duration-150',
                           isActive(child.href)
@@ -165,14 +179,14 @@ export default function Sidebar() {
             }
 
             const href = item.href!;
-            if (collapsed) {
+            if (isCollapsed) {
               return (
                 <Tooltip key={item.name}>
                   <TooltipTrigger className={cn(
                     'flex items-center justify-center h-10 rounded-lg transition-all duration-200 w-full',
                     isActive(href) ? 'bg-[#C9A84C]/15 text-[#C9A84C]' : 'hover:bg-white/8 text-white/70 hover:text-white'
                   )}>
-                    <Link href={href} className="flex items-center justify-center w-full h-full">
+                    <Link href={href} onClick={onNavigate} className="flex items-center justify-center w-full h-full">
                       <item.icon className="w-5 h-5 shrink-0" />
                     </Link>
                   </TooltipTrigger>
@@ -182,7 +196,7 @@ export default function Sidebar() {
             }
 
             return (
-              <Link key={item.name} href={href}
+              <Link key={item.name} href={href} onClick={onNavigate}
                 className={cn(
                   'flex items-center gap-3 px-3 h-10 rounded-lg transition-all duration-200 text-sm',
                   isActive(href)
@@ -197,15 +211,16 @@ export default function Sidebar() {
         </nav>
       </ScrollArea>
 
-      {/* Collapse toggle */}
-      <div className="p-2 border-t border-white/10 shrink-0">
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="w-full flex items-center justify-center h-9 rounded-lg hover:bg-white/10 transition-colors text-white/50 hover:text-white"
-        >
-          {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-        </button>
-      </div>
+      {!isMobile && (
+        <div className="p-2 border-t border-white/10 shrink-0">
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="w-full flex items-center justify-center h-9 rounded-lg hover:bg-white/10 transition-colors text-white/50 hover:text-white"
+          >
+            {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+          </button>
+        </div>
+      )}
     </aside>
   );
 }
